@@ -1,37 +1,8 @@
-const { Observable } = rxjs;
+const { Observable, ajax: { ajax } } = rxjs;
 
+const getTodoObs = ajax('https://jsonplaceholder.typicode.com/todos/1');
 
-const simpleObs = new Observable(subscriber => {
-    console.log('a simple observable is "executed"');
+getTodoObs.subscribe(resp => console.log('response', resp.response));
 
-    let nextVal = 1;
-
-    const interval = setInterval(() => {
-        console.log('Observable will return new value');
-        subscriber.next(nextVal++);
-
-        if (nextVal === 3) {
-            subscriber.complete();
-            subscriber.next(4);// this won't have any effect
-        }
-    }, 1500);
-
-    return () => {// it is really important that we cleanup Observables here, otherwise it is never deleted properly
-        console.log(`Subscriber unsubscribed, Observable completed, or Observable emitted error, cleaning up...`);
-        clearInterval(interval);
-        console.log(`Observable won't emit any more values`);
-    }
-})
-
-// alternative syntax for handling next, error, complete
-const sub = simpleObs.subscribe({
-    next: val => {
-        console.log('got a value:', val);
-        if (val == 4) {
-            console.log('unsubscribing from subscription');
-            sub.unsubscribe();
-        }
-    },
-    error: err => console.warn('received an error from Observable', err),
-    complete: () => console.log('looks like Observable is done!')
-});
+// important: subscribing again initiates a new HTTP request!
+getTodoObs.subscribe(resp => console.log('response of second subscribe', resp.response));
