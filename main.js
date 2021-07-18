@@ -1,8 +1,9 @@
-const { Observable, ajax: { ajax } } = rxjs;
+const { Observable, ajax: { ajax }, fromEvent } = rxjs;
 
-const getTodoObs = ajax('https://jsonplaceholder.typicode.com/todos/1');
+const clickObs = fromEvent(document.getElementById('test-btn'), 'click');
 
-getTodoObs.subscribe(resp => console.log('response', resp.response));
+clickObs.subscribe(event => console.log('click event', event));
 
-// important: subscribing again initiates a new HTTP request!
-getTodoObs.subscribe(resp => console.log('response of second subscribe', resp.response));
+const textObs = fromEvent(document.getElementById('test-input'), 'input');
+
+textObs.subscribe(event => console.log('input value', event.target.value));
