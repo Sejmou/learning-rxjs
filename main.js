@@ -10,27 +10,23 @@ const simpleObs = new Observable(subscriber => {
         console.log('Observable will return new value');
         subscriber.next(nextVal++);
 
-        if (nextVal === 3) subscriber.error('oops, we f*cked up');
+        if (nextVal === 3) {
+            subscriber.complete();
+            subscriber.next(4);// this won't have any effect
+        }
     }, 1500);
 
-    return () => {
-        console.log(`Subscriber unsubscribed (or an error occurred), won't emit any more values`);
+    return () => {// it is really important that we cleanup Observables here, otherwise it is never deleted properly
+        console.log(`Subscriber unsubscribed, Observable completed, or Observable emitted error, cleaning up...`);
         clearInterval(interval);
+        console.log(`Observable won't emit any more values`);
     }
 })
 
-const subWithoutErrHandling = simpleObs.subscribe(val => {
-    console.log('subWithoutErrHandling got a value:', val);
+const sub = simpleObs.subscribe(val => {
+    console.log('got a value:', val);
     if (val == 4) {
-        console.log('subWithoutErrHandling unsubscribing from subscription');
-        subWithoutErrHandling.unsubscribe();
+        console.log('unsubscribing from subscription');
+        sub.unsubscribe();
     }
-});
-
-const subWithErrHandling = simpleObs.subscribe(val => {
-    console.log('subWithErrHandling got a value from subscription:', val);
-    if (val == 4) {
-        console.log('subWithErrHandling unsubscribing from subscription');
-        subWithErrHandling.unsubscribe();
-    }
-}, err => console.warn(`subWithErrHandling received error ${err}`));
+}, err => console.warn('received an error from Observable', err), () => console.log('looks like Observable is done!'));
