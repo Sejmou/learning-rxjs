@@ -1,9 +1,10 @@
-const { Observable, fromEvent, operators: { map } } = rxjs;
+const { Observable, fromEvent, operators: { map, filter } } = rxjs;
 
 // Observable -> operator_1 -> ... -> operator_n -> Observable
 
-const inputObs = fromEvent(document.getElementById('test-input'), 'input');
+const filteredTextObs = filter(text => text.length > 3)(
+    map(e => e.target.value)(
+        fromEvent(document.getElementById('test-input'), 'input')
+    ));
 
-const inputTextObs = map(e => e.target.value)(inputObs);
-
-inputTextObs.subscribe(text => console.log(text));
+filteredTextObs.subscribe(text => console.log(text));
