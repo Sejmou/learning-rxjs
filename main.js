@@ -1,5 +1,5 @@
-const { Observable, ajax: { ajax }, fromEvent, of } = rxjs;
+const { Observable, ajax: { ajax }, fromEvent, of, interval } = rxjs;
 
-const simpleObs = of(1, 2, 3, 'some text');
+const delayedValsObs = interval(1000);
 
-simpleObs.subscribe(val => console.log(val));
+delayedValsObs.subscribe(val => console.log(val));
