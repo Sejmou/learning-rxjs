@@ -1,5 +1,9 @@
-const { Observable, ajax: { ajax }, fromEvent, of, interval } = rxjs;
+const { Observable, ajax: { ajax }, fromEvent, of, interval, from } = rxjs;
 
-const delayedValsObs = interval(1000);
+const fromObs1 = from([1, 2, 3]);
 
-delayedValsObs.subscribe(val => console.log(val));
+fromObs1.subscribe(val => console.log(val));
+
+const fromObs2 = from(new Promise(resolve => resolve('one')));
+
+fromObs2.subscribe(val => console.log(val));
