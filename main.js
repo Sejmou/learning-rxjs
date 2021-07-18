@@ -23,10 +23,15 @@ const simpleObs = new Observable(subscriber => {
     }
 })
 
-const sub = simpleObs.subscribe(val => {
-    console.log('got a value:', val);
-    if (val == 4) {
-        console.log('unsubscribing from subscription');
-        sub.unsubscribe();
-    }
-}, err => console.warn('received an error from Observable', err), () => console.log('looks like Observable is done!'));
+// alternative syntax for handling next, error, complete
+const sub = simpleObs.subscribe({
+    next: val => {
+        console.log('got a value:', val);
+        if (val == 4) {
+            console.log('unsubscribing from subscription');
+            sub.unsubscribe();
+        }
+    },
+    error: err => console.warn('received an error from Observable', err),
+    complete: () => console.log('looks like Observable is done!')
+});
