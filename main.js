@@ -1,17 +1,35 @@
-const { Observable, fromEvent, operators: { map, filter } } = rxjs;
+const { Observable, of, ajax: { ajax }, operators: { map, mergeMap, concatMap, switchMap, exhaustMap } } = rxjs;
 
-// Observable -> operator_1 -> ... -> operator_n -> Observable
-
-// this is a bit hard to read...
-// const filteredTextObs = filter(text => text.length > 3)(
-//     map(e => e.target.value)(
-//         fromEvent(document.getElementById('test-input'), 'input')
-//     ));
-
-// pipe operator to the rescue!
-const filteredTextObs = fromEvent(document.getElementById('test-input'), 'input').pipe(
-    map(e => e.target.value),
-    filter(text => text.length > 3)
+const nums = of(1, 2, 3, 4, 5, 6, 7);
+const numsWithDelay = new Observable(subscriber => {
+    subscriber.next(1);
+    subscriber.next(2);
+    subscriber.next(3);
+    setTimeout(() => {
+        subscriber.next(4);
+        subscriber.next(5);
+        subscriber.next(6);
+        subscriber.next(7);
+        subscriber.complete();
+    }, 1250);
+});
+const getNum = (num) => ajax({
+    url: 'http://localhost:3000',
+    method: 'POST',
+    body: num.toString()
+}).pipe(
+    map(res => res.response),
+    map(numStr => +numStr)
 );
+const processNum = (num) => new Observable(subscriber => {
+    subscriber.next(num + '_1');
+    setTimeout(() => {
+        subscriber.next(num + '_2');
+        setTimeout(() => {
+            subscriber.next(num + '_3');
+            subscriber.complete();
+        }, Math.random() * 1000);
+    }, Math.random() * 2000);
+});
 
-filteredTextObs.subscribe(text => console.log(text));
+processNum(6).subscribe(val => console.log('value', val));
