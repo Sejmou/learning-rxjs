@@ -1,9 +1,17 @@
-const { Observable, ajax: { ajax }, fromEvent, of, interval, from } = rxjs;
+const { Observable, fromEvent } = rxjs;
 
-const fromObs1 = from([1, 2, 3]);
+// Observable -> operator_1 -> ... -> operator_n -> Observable
 
-fromObs1.subscribe(val => console.log(val));
+function inputValOp(source) {// source is an Observable!
+    return new Observable(subscriber => {
+        source.subscribe(val => {
+            subscriber.next(val.target.value);
+        });
+    });
+}
 
-const fromObs2 = from(new Promise(resolve => resolve('one')));
+const inputObs = fromEvent(document.getElementById('test-input'), 'input');
 
-fromObs2.subscribe(val => console.log(val));
+const inputTextObs = inputValOp(inputObs);
+
+inputTextObs.subscribe(text => console.log(text));
