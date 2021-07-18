@@ -1,9 +1,5 @@
-const { Observable, ajax: { ajax }, fromEvent } = rxjs;
+const { Observable, ajax: { ajax }, fromEvent, of } = rxjs;
 
-const clickObs = fromEvent(document.getElementById('test-btn'), 'click');
+const simpleObs = of(1, 2, 3, 'some text');
 
-clickObs.subscribe(event => console.log('click event', event));
-
-const textObs = fromEvent(document.getElementById('test-input'), 'input');
-
-textObs.subscribe(event => console.log('input value', event.target.value));
+simpleObs.subscribe(val => console.log(val));
