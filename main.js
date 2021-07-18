@@ -12,11 +12,18 @@ const simpleObs = new Observable(subscriber => {
 
     let nextVal = 4;
     setInterval(() => {
-        console.log('about to return new value');
+        console.log('Observable will return new value');
         subscriber.next(nextVal++);
     }, 1500);
 })
 
-simpleObs.subscribe(val => console.log('got a value from first subscription:', val));
+// we can choose to unsubscribe later by storing the subscription and calling unsubscribe() on it
+const subscription = simpleObs.subscribe(val => {
+    console.log('got a value from subscription:', val);
+    if (val == 4) {
+        console.log('unsubscribing from subscription');
+        subscription.unsubscribe();
+    }
+});
 
-simpleObs.subscribe(val => console.log('got a value from second subscription:', val));
+//... however, this doesn't "kill" the Observable, it still keeps on emitting values...
