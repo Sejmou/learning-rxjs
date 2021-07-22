@@ -34,9 +34,13 @@ const processNum = (num) => new Observable(subscriber => {
 
 
 nums.pipe(
-    concatMap(n => getNum(n))// note: the order of elements is maintained!
-    // concatMap listens to source and processes incoming values one-by-one
-    // it waits until the generated inner Observable for the current value completes!
-    // this means if for example getNum for a num would never complete, concatMap would be stuck too!
-).subscribe(val => console.log('value', val));
-// general use cases for concatMap: we need to preserve order; each operation has to finish before the next one is triggered
+    switchMap(n => getNum(n))// this will only log 7 (result of getNum() for last num of nums)!
+    //reason: each inner observable got cancelled as soon as a new value arrived in the value stream of nums
+    // as the values of nums arrive practically synchronously, each http request except for the last one (for 7) got cancelled before it could complete 
+).subscribe(val => console.log('nums -> getNum value', val));
+
+numsWithDelay.pipe(
+    switchMap(n => getNum(n))// there's a delay between getting the first 3 and following 4 of the total 7 nums emitted by numsWithDelay -> we get 3 and 7
+).subscribe(val => console.log('numsWithDelay -> getNum value', val));
+
+// use case for switchMap: whenever we only care about the latest value emitted by an Observable
