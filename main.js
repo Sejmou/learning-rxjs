@@ -34,13 +34,14 @@ const processNum = (num) => new Observable(subscriber => {
 
 
 nums.pipe(
-    switchMap(n => getNum(n))// this will only log 7 (result of getNum() for last num of nums)!
-    //reason: each inner observable got cancelled as soon as a new value arrived in the value stream of nums
-    // as the values of nums arrive practically synchronously, each http request except for the last one (for 7) got cancelled before it could complete 
+    exhaustMap(n => getNum(n))// this will only log 1 (result of getNum() for first num of nums)!
+    //reason: each new value emitted by the Observable is ignored as long as the Observable for the currently handled value hasn't completed 
+    // as the values of nums arrive practically synchronously, only for the first value an http request is made
+    // (all other values arrive before the http request for the first one is done) 
 ).subscribe(val => console.log('nums -> getNum value', val));
 
 numsWithDelay.pipe(
-    switchMap(n => getNum(n))// there's a delay between getting the first 3 and following 4 of the total 7 nums emitted by numsWithDelay -> we get 3 and 7
+    exhaustMap(n => getNum(n))// there's a delay between getting the first 3 and following 4 of the total 7 nums emitted by numsWithDelay -> we get 1 and 4
 ).subscribe(val => console.log('numsWithDelay -> getNum value', val));
 
-// use case for switchMap: whenever we only care about the latest value emitted by an Observable
+// use case for exhaustMap: whenever we want to make sure an emitted value is handled completely and ignore the ones that arrive while it is being handled? 
